@@ -24,14 +24,14 @@ class Server:
         self.listen_soc.bind((socket.gethostname(), 80))
         self.broadcast_address = '172.1.0.0'
     
-    def BroadCastUDPSetup(self):
+    def broadcast_UDP_setup(self):
         self.sockUDP.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.sockUDP.bind((self.server_address, self.my_port))
         print("sendUDPBroadcast: Bind Completed")
         self.sockUDP.connect(('2121', self.my_port))
         print("sendUDPBroadcast: Connect Complete")
 
-    def sendUDPBroadcast(self):
+    def send_UDP_broadcast(self):
         print("Length of sent:", len(struct.pack('!IbH', 0xabcddcba, 0x2, 2121)))
         sent = self.sockUDP.sendto(struct.pack('IbH', 0xabcddcba, 0x2, 2121), ('<broadcast>', 13177))
         print("Sent length:", sent)
@@ -46,11 +46,11 @@ class Server:
     
 
 serv = Server("IDUNNO", False)
-serv.BroadCastUDPSetup()
+serv.broadcast_UDP_setup()
 time_counter = 0
 start_time = time.time()
 while time.time() <= start_time + 10:
     time_counter +=1
-    serv.sendUDPBroadcast()
+    serv.send_UDP_broadcast()
     time.sleep(1)
     print(time_counter)
