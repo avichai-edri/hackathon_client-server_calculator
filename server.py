@@ -1,4 +1,4 @@
-from scapy import get_if_addr
+from scapy import *
 import socket
 import struct
 import time
@@ -11,12 +11,12 @@ class Server:
     def __init__(self, port, test) -> None:
         # Get port, and whether or not its a test.
         self.port = port
-        if test:
-            self.IP = get_if_addr('eth2')
-            self.broadcastAddr = '172.99.255.255'
-        else:
-            self.IP = get_if_addr('eth1')
-            self.broadcastAddr = '172.1.255.255'
+        # if test:
+        #     self.IP = get_if_addr('eth2')
+        #     self.broadcastAddr = '172.99.255.255'
+        # else:
+        #     self.IP = get_if_addr('eth1')
+        #     self.broadcastAddr = '172.1.255.255'
         
 
         # Currently run on test server.
@@ -29,16 +29,17 @@ class Server:
         self.listen_soc.bind((socket.gethostname(), 80))
         self.broadcast_address = '172.99.255.255'
     
-    def sendUDPBroadcast(self):
+    def BroadCastUDPSetup(self):
         self.sockUDP.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.sockUDP.bind((self.hostIP, self.my_port))
         print("sendUDPBroadcast: Bind Completed")
         self.sockUDP.connect(('2121', self.my_port))
         print("sendUDPBroadcast: Connect Complete")
-        msg = "Can you hear me???"
-        print(len(struct.pack('!IbH', 0xabcddcba, 0x2, 2121)))
+
+    def sendUDPBroadcast(self):
+        print("Length of sent:", len(struct.pack('!IbH', 0xabcddcba, 0x2, 2121)))
         sent = self.sockUDP.sendto(struct.pack('IbH', 0xabcddcba, 0x2, 2121), ('<broadcast>', 13177))
-        print(sent)
+        print("Sent length:", sent)
         
 
     def listen(self):
@@ -49,8 +50,8 @@ class Server:
             # e.g:
     
 
-serv = Server()
-serv.sendUDPBroadcast()
+serv = Server("IDUNNO", False)
+serv.BroadCastUDPSetup()
 time_counter = 0
 start_time = time.time()
 while time.time() <= start_time + 10:
