@@ -12,8 +12,15 @@ class Server:
         # Get port, and whether or not its a test.
         self.port = port
         self.server_address = '172.1.0.121'
-        
 
+        # Start TCP socket that will listen for new teams
+        self.tcp = socket(AF_INET, SOCK_STREAM)
+        self.tcp.bind(('', GAME_PORT))
+        self.tcp.listen(10)
+        self.found = dict() # dict of
+        self.confirmed_teams = False  # Whether we found two teams that want to play, and they both confirmed this
+
+        
         # Currently run on test server.
         self.listen = False  # value to stop listener
         self.listen_soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,10 +44,18 @@ class Server:
         print("Sent length:", sent)
         
 
-    def listen(self):
-        self.listen_soc.listen(2)  # max num of connect requests before refusing connections
-        while self.listen is True:
-            clientsocket, address = self.listen_soc.accept()
+    def find_teams(self):
+        while not self.confirmed_teams:
+            try:
+                new_socket, address = self.tcp.accept()
+                if not len(self.found) == 2:  # stops incoming traffic, checks if # confirmed sockets greater than 2, 
+                    new_socket.setblocking(0) # socket.recv is a blocking call. Could use mutex? But then if recv fails...
+                    team_name = new_socket.recv(2048).decode()
+                    #print(f"Team {team_name} Connected!")
+                    self.team_names[new_socket.getsockname()] = team_name
+                    self.found.append(socket)
+        # while self.listen is True:
+        #     clientsocket, address = self.listen_soc.accept()
             # TODO: do whatever you need with the socket.
             # e.g:
     
