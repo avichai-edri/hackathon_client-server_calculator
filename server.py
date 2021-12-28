@@ -2,19 +2,22 @@
 import socket
 #import threading
 #import multiprocessing
-
+print("Starting")
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect(('2121', '13177'))
+sock.connect(('2121', 13177))
 msg = "Can you hear me???"
 totalsent = 0
 print("Entering")
-while totalsent < 13*8:
-    sent = self.sock.send(msg[totalsent:])
-    print(sent)
-    if sent == 0:
-        raise RuntimeError("socket connection broken")
-    totalsent = totalsent + sent
-print("nkds")
+sent = self.sock.sendto(struct.pack('!IbH', 0xabcddcba, 0x2, 2121), ('<broadcast>', 13177))
+print(sent)
+# while totalsent < 13*8:
+#     print(msg[totalsent:])
+#     sent = self.sock.sendto(struct.pack(0xabcddcba + 0x2 + msg[totalsent:].encode('utf-8')), ('<broadcast>', 13177)))
+#     print(sent)
+#     if sent == 0:
+#         raise RuntimeError("socket connection broken")
+#     totalsent = totalsent + sent
+# print("nkds")
 
 class server:
     def __init__(self) -> None:

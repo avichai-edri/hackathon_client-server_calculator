@@ -1,4 +1,5 @@
 import socket
+import struct
 class client:
     def __init__(self, team_name,TEST):
         self.tema_name=team_name
@@ -11,6 +12,13 @@ class client:
         self.gameClientUDP.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         while True:
             data, addr = self.gameClientUDP.recvfrom(1024)
+            magic_cookie,message_type,server_port= struct.unpack('!IbH',data)
+            if(server_port == 2121):
+                print(magic_cookie)
+                print(message_type)
+                print(pork)
+                break;
+            print("again")
             
             
 
