@@ -19,10 +19,12 @@ class client:
                 pass
             print(f"data: {len(data)}.")
             magic_cookie,message_type,server_port = struct.unpack('IbH',data)
+           #todo 
             if server_port==2121:
                 print(magic_cookie)
                 print(message_type)
                 print(server_port)
+                break
 
             # self.gameClientTCP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
             # self.gameClientTCP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
