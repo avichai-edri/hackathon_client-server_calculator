@@ -43,7 +43,7 @@ class Server:
         print("Sent length:", sent)
         
     def game(self):
-
+        return
     def find_teams(self):
         while not self.confirmed_teams:
             try:
@@ -70,7 +70,7 @@ class Server:
                     for socket in unresponsive:
                         self.found.remove(socket)
                     
-                    if len(self.found) == 2
+                    if len(self.found) == 2:
                         self.team1_name = self.team_names[self.found[0]]
                         self.team2_name = self.team_names[self.found[0]]
                         print(f"Team {self.team1_name} and Team {self.team2_name} have confirmed their connection")
