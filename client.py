@@ -4,16 +4,42 @@ import time
 import getch
 import multiprocessing
 
+def color(color, backgrd="black"):
+    color = color.lower()
+    backgrd = backgrd.lower()
+    color_dict = {'black': 30, 'red': 31, 'green': 32, 'yellow': 33, 
+                    'blue': 34, 'purple': 35, 'cyan': 36, 'white': 37}
+    back_dict = dict()
+    for color, num in color_dict.items():
+        back_dict[color] = num + 10
+    
+    return f"\033[1;{color_dict[color]};{back_dict[backgrd]}m"
+
+GREEN = '\033[1;32;40m'
+RED = '\033[1;31;40m'
+BLUE = '\033[1;34;40m'
+PURPLE = '\033[1;35;40m'
+CYAN = '\033[1;36;40m'
+CBOLD     = '\33[1m'
+CGREY     = '\33[90m'
+CSELECTED = '\33[7m'
+CEND      = '\33[0m'
+GREEN = '\033[1;32;40m'
+RED = '\033[1;31;40m'
+BLUE = '\033[1;34;40m'
 class client:
+
     def __init__(self, team_name,TEST):
+
         self.true_magic_cookie=0xabcddcba
         self.true_message_type=0x2
         self.team_name=team_name
-        self.gameClientUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)#, socket.IPPROTO_UDP
+        self.gameClientUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #, socket.IPPROTO_UDP
         self.gameClientTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print("Client started, listening for offer requests...")
+        print(f"{BLUE}Client started, listening for offer requests...")
         self.true_magic_cookie= 0xabcddcba
         self.true_message_type= 0x2
+    
     def looking_server(self):
         self.gameClientUDP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         self.gameClientUDP.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -30,12 +56,13 @@ class client:
 
                 check_magic = magic_cookie == self.true_magic_cookie
                 check_message_type= message_type==self.true_message_type
-                if check_message_type and check_magic and int(server_port) > 0  :
-                    print(f"Received offer from {addr[0]},attempting to connect...")
+                if check_message_type and check_magic and int(server_port) > 0:
+                    print(f"{GREEN}Received offer from {addr[0]},attempting to connect...")
                     self.connecting_to_TCP_server(addr[0],server_port)
             except Exception as e:
                 # print(e)
                 pass
+    
     def connecting_to_TCP_server(self,addr, gamePort):
         """
         Connecting to Game Server
@@ -61,13 +88,13 @@ class client:
                 pass
             if data is None:
                 # {CBOLD}{CGREY}{CSELECTED}{CEND}
-                print(f'No Welcome Message has been received. Lets find new Server.')
+                print(f"{RED}No Welcome Message has been received. Lets find new Server.")
                 raise Exception('Connected Server sucks.')
             else:
                 print(data.decode())
             # Start the game !
             self.game_on()
-            print('Server disconnected, listening for offer requests...')
+            print(f"{CYAN}Server disconnected, listening for offer requests...")
         except Exception as e:
             print(e)
             print("connection doesn't work let's try new server")
@@ -91,7 +118,7 @@ class client:
         except:
             pass
         if win_message is None:
-            print(f"No win_message Message, but it's over..")
+            print(f"{PURPLE}No win_message Message, but it's over..")
         else:
             print(win_message.decode())
     
