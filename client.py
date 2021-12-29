@@ -51,16 +51,17 @@ class client:
                 data, addr = self.gameClientUDP.recvfrom(1024)
                 # if len(data)!= struct.calcsize('IbH'):
                 #     continue
-                magic_cookie,message_type,server_port = struct.unpack('Ibh',data[:7])
+                magic_cookie,message_type,server_port = struct.unpack('Ibh',data)
             #todo 
+                print(server_port)
 
                 check_magic = magic_cookie == self.true_magic_cookie
                 check_message_type= message_type==self.true_message_type
-                if check_message_type and check_magic and int(server_port) > 0:
-                    print(f"{GREEN}Received offer from {addr[0]},attempting to connect...")
+                print(f"{GREEN}Received offer from {addr[0]},attempting to connect...")
+                if check_message_type and check_magic :
                     self.connecting_to_TCP_server(addr[0],server_port)
             except Exception as e:
-                # print(e)
+                print(e)
                 pass
     
     def connecting_to_TCP_server(self,addr, gamePort):
@@ -136,7 +137,7 @@ class client:
                 pass
 
 if __name__ == '__main__':
-    c=client("the good fellas",False)
+    c=client("the good fellas",True)
     c.looking_server()
 
 
