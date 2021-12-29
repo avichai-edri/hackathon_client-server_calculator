@@ -42,6 +42,7 @@ class Server:
         sent = self.sockUDP.sendto(struct.pack('IbH', 0xabcddcba, 0x2, 2121), ('<broadcast>', 13177))
         print("Sent length:", sent)
         
+    def game(self):
 
     def find_teams(self):
         while not self.confirmed_teams:
@@ -69,8 +70,12 @@ class Server:
                     for socket in unresponsive:
                         self.found.remove(socket)
                     
-                    self.confirmed_teams = True
-                    self.found = self.found[:2]  # TODO: Should we check to see that if there are extra connections, and disconnect? Is that even possible?
+                    if len(self.found) == 2
+                        self.team1_name = self.team_names[self.found[0]]
+                        self.team2_name = self.team_names[self.found[0]]
+                        print(f"Team {self.team1_name} and Team {self.team2_name} have confirmed their connection")
+                        self.confirmed_teams = True
+                        self.found = self.found[:2]  # TODO: Should we check to see that if there are extra connections, and disconnect? Is that even possible?
                         
                 # for socket in to_remove:
                 #     print(f"Team {self.get_team_name(socket)} Disconnected") # PRINT TEAM NAME
@@ -78,8 +83,26 @@ class Server:
                 #     self.team_sockets.remove(socket)
             except:
                 pass
-            
     
+            
+        def __play(self):
+            num1 = random.randint(0, 4)
+            num2 = random.randint(0, 4)
+            s = "Hello and welcome to the award winning quick maths game!!\n"
+            s += f"Team 1: {self.team1_name} vs Team2: {self.team2_name}\n"
+            s += f"The question for you is: What is {num1}+{num2}?"
+            
+            print(s)
+            s = s.encode()
+            self.found[0].sendall(s)
+            self.found[1].sendall(s)
+
+            game_over = False
+            while not game_over:
+                # TODO: implement actual game
+                pass
+                
+
 
 serv = Server("IDUNNO", False)
 serv.broadcast_UDP_setup()
