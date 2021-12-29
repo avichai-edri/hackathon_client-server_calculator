@@ -14,9 +14,9 @@ class Server:
         self.server_address = '172.1.0.121'
 
         # Start TCP socket that will listen for new teams
-        self.tcp = socket(AF_INET, SOCK_STREAM)
-        self.tcp.bind(('', GAME_PORT))
-        self.tcp.listen(10)
+        self.server_tcp = socket(AF_INET, SOCK_STREAM)
+        self.server_tcp.bind(('', GAME_PORT))
+        self.server_tcp.listen(8)
         self.found = dict() # dict of
         self.confirmed_teams = False  # Whether we found two teams that want to play, and they both confirmed this
 
@@ -25,15 +25,14 @@ class Server:
         self.listen = False  # value to stop listener
         self.listen_soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sockUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        self.UDP_port = 65339
         self.hostIP = ''
         self.my_port = 13177
-        # binds socket to a well known port, and a public host.
-        self.listen_soc.bind((socket.gethostname(), 80))
         self.broadcast_address = '172.1.0.0'
     
     def broadcast_UDP_setup(self):
         self.sockUDP.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        self.sockUDP.bind((self.server_address, self.my_port))
+        self.sockUDP.bind((self.server_address, self.UDP_port))  # not sure exactly what to put here
         print("sendUDPBroadcast: Bind Completed")
         self.sockUDP.connect(('2121', self.my_port))
         print("sendUDPBroadcast: Connect Complete")
@@ -47,17 +46,39 @@ class Server:
     def find_teams(self):
         while not self.confirmed_teams:
             try:
-                new_socket, address = self.tcp.accept()
-                if not len(self.found) == 2:  # stops incoming traffic, checks if # confirmed sockets greater than 2, 
-                    new_socket.setblocking(0) # socket.recv is a blocking call. Could use mutex? But then if recv fails...
-                    team_name = new_socket.recv(2048).decode()
-                    #print(f"Team {team_name} Connected!")
+                new_socket, address = self.server_tcp.accept()
+                if len(self.found) < 2:  # stops incoming traffic, checks if # confirmed sockets greater than 2, 
+                    # socket.recv is a blocking call. Could use mutex? But then if recv fails...
+                    # new_socket.setblocking(0) # actually, why not make it block?
+                    team_name = new_socket.recv(1024).decode()
+                    print(f"We found {team_name}'s connection")
                     self.team_names[new_socket.getsockname()] = team_name
                     self.found.append(socket)
-        # while self.listen is True:
-        #     clientsocket, address = self.listen_soc.accept()
-            # TODO: do whatever you need with the socket.
-            # e.g:
+                else:
+                    # Tries to send message to each team.
+                    unresponsive = []
+                    for socket in self.found:
+                        try:
+                            socket.send("Marco!".encode()) 
+                        except:
+                            # if they don't respond, remove them from the list. 
+                            # Cant do it right here as we cant remove from a list while iterating over it
+                            unresponsive.append(socket)
+                    
+                    # removes unresponsive sockets
+                    for socket in unresponsive:
+                        self.found.remove(socket)
+                    
+                    self.confirmed_teams = True
+                    self.found = self.found[:2]  # TODO: Should we check to see that if there are extra connections, and disconnect? Is that even possible?
+                        
+                # for socket in to_remove:
+                #     print(f"Team {self.get_team_name(socket)} Disconnected") # PRINT TEAM NAME
+                #     del self.team_names[socket.getsockname()]
+                #     self.team_sockets.remove(socket)
+            except:
+                pass
+            
     
 
 serv = Server("IDUNNO", False)
